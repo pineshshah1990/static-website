@@ -24,7 +24,7 @@ jobs:
       - name: Upload to Azure Storage
         run: |
           az storage blob upload-batch \
-            --account-name YOUR-STORAGE-ACCOUNT-NAME \
+            --account-name aclstatic \
             --destination '$web' \
             --source ./ \
             --overwrite \
