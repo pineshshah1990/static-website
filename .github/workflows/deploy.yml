@@ -26,7 +26,7 @@ jobs:
           az storage blob upload-batch \
             --account-name YOUR-STORAGE-ACCOUNT-NAME \
             --destination '$web' \
-            --source ./website-files \
+            --source ./ \
             --overwrite \
             --auth-mode login
       
