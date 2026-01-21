@@ -1,0 +1,47 @@
+name: Deploy Static Website to Azure
+
+on:
+  push:
+    branches: [ main-test ]  
+  workflow_dispatch:  # Allows manual trigger from GitHub Actions tab
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      # Step 1: Checkout the code from repository
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      # Step 2: Login to Azure using service principal credentials
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      
+      # Step 3: Upload files to Azure Storage $web container
+      - name: Upload to Azure Storage
+        run: |
+          az storage blob upload-batch \
+            --account-name YOUR-STORAGE-ACCOUNT-NAME \
+            --destination '$web' \
+            --source ./website-files \
+            --overwrite \
+            --auth-mode login
+      
+      # Step 4: Display deployment success message and URL
+      - name: Deployment Complete
+        run: |
+          echo "✅ Deployment completed successfully!"
+          echo "🌐 Your website is now live at:"
+          az storage account show \
+            --name YOUR-STORAGE-ACCOUNT-NAME \
+            --resource-group AKS \
+            --query "primaryEndpoints.web" \
+            --output tsv
+      
+      # Step 5: Logout from Azure (security best practice)
+      - name: Azure Logout
+        run: az logout
+        if: always()
